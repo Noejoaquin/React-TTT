@@ -3,6 +3,7 @@ import './App.css';
 import { useState } from 'react';
 
 function Tile({value, handleTileClick}) {
+  // render a button which will have an onClick handler
   return(
     <button
       className='board-tile'
@@ -13,16 +14,13 @@ function Tile({value, handleTileClick}) {
   )
 }
 
-function App() {
-  const [xIsNext, setXIsNext] = useState(true);
-  const [tiles, setTiles] = useState(new Array(9).fill(null));
-
+function Board({xIsNext, tiles, onPlay}) {
   function handleTileClick(i) {
     if (tiles[i] || calculateWinner(tiles)) return;
+    // make a copy of state using .slice()
     const newTiles = tiles.slice();
     xIsNext ? newTiles[i] = 'X': newTiles[i] = 'O';
-    setXIsNext(!xIsNext);
-    setTiles(newTiles);
+    onPlay(newTiles);
   }
 
   const winner = calculateWinner(tiles);
@@ -30,7 +28,7 @@ function App() {
 
   return (
     <>
-     <div class='status'>{status}</div>
+     <div className='status'>{status}</div>
      <div className='board'>
         <Tile value={tiles[0]} handleTileClick={() => handleTileClick(0)}/>
         <Tile value={tiles[1]} handleTileClick={() => handleTileClick(1)}/>
@@ -44,6 +42,51 @@ function App() {
      </div>
     </>
   );
+}
+
+function Game() {
+  const [xIsNext, setXIsNext] = useState(true);
+  // keeping a history will allow us to jump back into different game states
+  const [history, setHistory] = useState([new Array(9).fill(null)]);
+  const [currentMove, setCurrentMove] = useState(0);  
+  let currentTiles = history[currentMove];
+
+  function handlePlay(newTiles) {
+    // create a nextHistory which doesn't include moves after the one we have jumped to
+    // if we have made a new move after jumping.
+    const nextHistory = [...history.slice(0, currentMove + 1), newTiles]
+    setHistory(nextHistory) // sets the new history
+    setCurrentMove(nextHistory.length - 1)
+    setXIsNext(!xIsNext);
+  };
+
+  function handleJumpTo(move) {
+    setCurrentMove(move);
+    setXIsNext(move % 2 === 0);
+  }
+
+  const moves = history.map((tiles, move) => {
+    const description = move === 0 ? 'Game start' :  `Move number ${move}`;
+    return(
+      <li key={move}>
+        <button onClick={() => handleJumpTo(move)}>{description}</button>
+      </li>
+    )
+  })
+  
+  return(
+  <div className='game-container'>
+    <div className='game-board'>
+      <Board xIsNext={xIsNext} tiles={currentTiles} onPlay={handlePlay}/>
+    </div>
+    <div>
+      <div className='game-info'>
+        <ol>{moves}</ol>
+      </div>
+    </div>
+  </div>
+    
+  )
 }
 
 function calculateWinner(tiles) {
@@ -66,4 +109,4 @@ function calculateWinner(tiles) {
   return null;
 }
 
-export default App;
+export default Game;
