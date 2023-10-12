@@ -2,6 +2,44 @@ import logo from './logo.svg';
 import './App.css';
 import { useState } from 'react';
 
+
+function View({ 
+  opponentSelected,
+  moves,
+  xIsNext,
+  tiles,
+  handlePlay,
+  handleAi}) {
+  if (opponentSelected) {
+    // if there is a selected opponent, return the game board
+    return (
+      <>
+        <div className='game-board'>
+        <Board xIsNext={xIsNext} tiles={tiles} onPlay={handlePlay} /> 
+        </div>
+        <div>
+          <div className='game-info'>
+            <ol>{moves}</ol>
+          </div>
+        </div>
+      </>
+    )
+  } else {
+    // otherwise, return the start screen
+    return <StartScreen handleAi={handleAi} />
+  }
+}
+function StartScreen({handleAi}) {
+  return(
+    <>
+      <div>
+        <h2>Who do you want to play?</h2>
+        <button onClick={() => handleAi(true)}>AI</button>
+        <button onClick={() => handleAi(false)}>Human</button>
+      </div>
+    </>
+  )
+}
 function Tile({value, handleTileClick}) {
   // render a button which will have an onClick handler
   return(
@@ -37,11 +75,22 @@ function Board({xIsNext, tiles, onPlay}) {
 }
 
 function Game() {
+  const [opponentSelected, setOpponentSelected] = useState(false);
+  const [isAi, setIsAi] = useState(false);
   const [xIsNext, setXIsNext] = useState(true);
   // keeping a history will allow us to jump back into different game states
   const [history, setHistory] = useState([new Array(9).fill(null)]);
   const [currentMove, setCurrentMove] = useState(0);  
   let currentTiles = history[currentMove];
+
+  function handleOpponentSelected() {
+    setOpponentSelected(!opponentSelected);
+  }
+
+  function handleAi(bool) {
+    handleOpponentSelected(true);
+    setIsAi(bool);
+  }
 
   function handlePlay(newTiles) {
     // create a nextHistory which doesn't include moves after the one we have jumped to
@@ -65,17 +114,31 @@ function Game() {
       </li>
     )
   })
+
+  if (isAi && !xIsNext && !calculateWinner(currentTiles)) {
+    const newTiles = currentTiles.slice();
+    // make a move by iterating through the tiles, and placing a marker at the first null space
+    for (let i=0; i < 9; i+=1) {
+      if (newTiles[i] === null) {
+        newTiles[i] = 'O'
+        break;
+      }
+    }
+    const nextHistory = [...history.slice(0, currentMove + 1), newTiles]
+    setHistory(nextHistory) // sets the new history
+    setCurrentMove(nextHistory.length - 1)
+    setXIsNext(!xIsNext);
+  }
   
   return(
   <div className='game-container'>
-    <div className='game-board'>
-      <Board xIsNext={xIsNext} tiles={currentTiles} onPlay={handlePlay}/>
-    </div>
-    <div>
-      <div className='game-info'>
-        <ol>{moves}</ol>
-      </div>
-    </div>
+    <View 
+      opponentSelected={opponentSelected} 
+      moves={moves}
+      xIsNext={xIsNext} 
+      handleAi={handleAi}
+      handlePlay={handlePlay}
+      tiles={currentTiles}/>
   </div>
     
   )
