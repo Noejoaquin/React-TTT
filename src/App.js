@@ -114,7 +114,8 @@ function Game() {
       </li>
     )
   })
-
+  
+  // TODO: Make AI smarter
   if (isAi && !xIsNext && !calculateWinner(currentTiles)) {
     const newTiles = currentTiles.slice();
     // make a move by iterating through the tiles, and placing a marker at the first null space
