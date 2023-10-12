@@ -30,15 +30,7 @@ function Board({xIsNext, tiles, onPlay}) {
     <>
      <div className='status'>{status}</div>
      <div className='board'>
-        <Tile value={tiles[0]} handleTileClick={() => handleTileClick(0)}/>
-        <Tile value={tiles[1]} handleTileClick={() => handleTileClick(1)}/>
-        <Tile value={tiles[2]} handleTileClick={() => handleTileClick(2)}/>
-        <Tile value={tiles[3]} handleTileClick={() => handleTileClick(3)}/>
-        <Tile value={tiles[4]} handleTileClick={() => handleTileClick(4)}/>
-        <Tile value={tiles[5]} handleTileClick={() => handleTileClick(5)}/>
-        <Tile value={tiles[6]} handleTileClick={() => handleTileClick(6)}/>
-        <Tile value={tiles[7]} handleTileClick={() => handleTileClick(7)}/>
-        <Tile value={tiles[8]} handleTileClick={() => handleTileClick(8)}/>
+      { tiles.map((tile, i) => <Tile value={tiles[i]} handleTileClick={() => handleTileClick(i)}/> )}
      </div>
     </>
   );
@@ -66,7 +58,7 @@ function Game() {
   }
 
   const moves = history.map((tiles, move) => {
-    const description = move === 0 ? 'Game start' :  `Move number ${move}`;
+    const description = move === 0 ? 'Game start' :  `Jump to move number ${move}`;
     return(
       <li key={move}>
         <button onClick={() => handleJumpTo(move)}>{description}</button>
