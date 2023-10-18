@@ -5,7 +5,7 @@ import { useState } from 'react';
 function View({ 
   opponentSelected,
   moves,
-  xIsNext,
+  currentPlayer,
   tiles,
   handlePlay,
   handleAi}) {
@@ -14,7 +14,7 @@ function View({
     return (
       <>
         <div className='game-board'>
-        <Board xIsNext={xIsNext} tiles={tiles} onPlay={handlePlay} /> 
+        <Board tiles={tiles} onPlay={handlePlay} currentPlayer={currentPlayer} /> 
         </div>
         <div>
           <div className='game-info'>
@@ -51,17 +51,17 @@ function Tile({value, handleTileClick}) {
   )
 }
 
-function Board({xIsNext, tiles, onPlay}) {
+function Board({tiles, onPlay, currentPlayer}) {
   function handleTileClick(i) {
     if (tiles[i] || calculateWinner(tiles)) return;
     // make a copy of state using .slice()
     const newTiles = tiles.slice();
-    xIsNext ? newTiles[i] = 'X': newTiles[i] = 'O';
+    currentPlayer === 'X' ? newTiles[i] = 'X': newTiles[i] = 'O';
     onPlay(newTiles);
   }
 
   const winner = calculateWinner(tiles);
-  const status = winner ? `The winner is ${winner}` : `Next player: ${xIsNext ? 'X' : 'O'}`
+  const status = winner ? `The winner is ${winner}` : `Next player: ${currentPlayer === 'X' ? 'X' : 'O'}`
 
   return (
     <>
@@ -75,7 +75,7 @@ function Board({xIsNext, tiles, onPlay}) {
 
 class AIPlayer {
   constructor(mark = 'O') {
-    k: this.mark = mark;
+    this.mark = mark;
     // blockingMove: arrayOfPossibleWinningScenariosForOpponent
     this.blockingMap = {
       0: [[1, 2], [3, 6], [4, 8]],
@@ -128,7 +128,7 @@ class AIPlayer {
 function Game() {
   const [opponentSelected, setOpponentSelected] = useState(false);
   const [isAi, setIsAi] = useState(false);
-  const [xIsNext, setXIsNext] = useState(true);
+  const [currentPlayer, setCurrentPlayer] = useState('X');
   // keeping a history will allow us to jump back into different game states
   const [history, setHistory] = useState([new Array(9).fill(null)]);
   const [currentMove, setCurrentMove] = useState(0);  
@@ -150,12 +150,12 @@ function Game() {
     const nextHistory = [...history.slice(0, currentMove + 1), newTiles]
     setHistory(nextHistory) // sets the new history
     setCurrentMove(nextHistory.length - 1)
-    setXIsNext(!xIsNext);
+    currentPlayer === 'X' ? setCurrentPlayer('O') : setCurrentPlayer('X');
   };
 
   function handleJumpTo(move) {
     setCurrentMove(move);
-    setXIsNext(move % 2 === 0);
+    move % 2 === 0 ? setCurrentPlayer('X') : setCurrentPlayer('O');
   }
 
   const moves = history.map((tiles, move) => {
@@ -168,7 +168,7 @@ function Game() {
   })
   
   if (isAi && !aiPlayer) aiPlayer = new AIPlayer();
-  if (aiPlayer && !xIsNext && !calculateWinner(currentTiles)) {
+  if (aiPlayer && currentPlayer === aiPlayer.mark && !calculateWinner(currentTiles)) {
     const newTiles = aiPlayer.move(currentTiles)
     console.log(newTiles, 'newTILES');
     handlePlay(newTiles);
@@ -179,7 +179,7 @@ function Game() {
     <View 
       opponentSelected={opponentSelected} 
       moves={moves}
-      xIsNext={xIsNext} 
+      currentPlayer={currentPlayer}
       handleAi={handleAi}
       handlePlay={handlePlay}
       tiles={currentTiles}/>
