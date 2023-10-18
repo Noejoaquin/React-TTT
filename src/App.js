@@ -2,7 +2,6 @@ import logo from './logo.svg';
 import './App.css';
 import { useState } from 'react';
 
-
 function View({ 
   opponentSelected,
   moves,
@@ -168,7 +167,6 @@ function Game() {
     )
   })
   
-  // TODO: Make AI smarter
   if (isAi && !aiPlayer) aiPlayer = new AIPlayer();
   if (aiPlayer && !xIsNext && !calculateWinner(currentTiles)) {
     const newTiles = aiPlayer.move(currentTiles)
