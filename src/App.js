@@ -76,6 +76,7 @@ function Board({tiles, onPlay, currentPlayer}) {
 class AIPlayer {
   constructor(mark = 'O') {
     this.mark = mark;
+    this.opponentMark = this.mark === 'X' ? 'O' : 'X'
     // blockingMove: arrayOfPossibleWinningScenariosForOpponent
     this.blockingMap = {
       0: [[1, 2], [3, 6], [4, 8]],
@@ -94,15 +95,18 @@ class AIPlayer {
     let newTiles = tiles.slice();
     // make a move by iterating through the tiles, and placing a marker at the first null space
     const blockingMove = this.#needBlockingMove(newTiles);
+    const winningMove = null;
     console.log(blockingMove, 'blocking Move');
     if (blockingMove) {
       newTiles[blockingMove] = this.mark;
+    } else if (winningMove) {
+
     } else {
       // for now we will move where it is first available if there is no blocking move
       // TODO: create a winning move function. -- will probably use the blockingMap again for that one.
       for(let i=0; i < 9; i += 1) {
         if (newTiles[i] === null) {
-          newTiles[i] = 'O'
+          newTiles[i] = this.mark
           break;
         } 
       }
@@ -118,7 +122,7 @@ class AIPlayer {
       for (let i=0; i < combosOfTilesToBlock.length; i += 1) {
         const tilesToBlock = combosOfTilesToBlock[i];
         // return the blocking move for the first scenario seen on the board
-        if (tiles[tilesToBlock[0]] === 'X' && tiles[tilesToBlock[1]] === 'X' && !tiles[blockingMove]) return blockingMove;
+        if (tiles[tilesToBlock[0]] === this.opponentMark && tiles[tilesToBlock[1]] === this.opponentMark && !tiles[blockingMove]) return blockingMove;
       }
     }
     return null;
@@ -167,7 +171,7 @@ function Game() {
     )
   })
   
-  if (isAi && !aiPlayer) aiPlayer = new AIPlayer();
+  if (isAi && !aiPlayer) aiPlayer = new AIPlayer('X');
   if (aiPlayer && currentPlayer === aiPlayer.mark && !calculateWinner(currentTiles)) {
     const newTiles = aiPlayer.move(currentTiles)
     console.log(newTiles, 'newTILES');
