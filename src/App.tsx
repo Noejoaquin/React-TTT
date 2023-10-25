@@ -1,9 +1,9 @@
-import logo from './logo.svg';
 import './App.css';
-import Utils from './utils';
+import { calculateWinner } from './utils';
 import AIPlayer from './aiPlayer';
 import View from './View';
 import { useState } from 'react';
+import React from 'react';
 
 function Game() {
   const [opponentSelected, setOpponentSelected] = useState(false);
@@ -13,14 +13,14 @@ function Game() {
   const [history, setHistory] = useState([new Array(9).fill(null)]);
   const [currentMove, setCurrentMove] = useState(0);  
   let currentTiles = history[currentMove];
-  let aiPlayer = null;
+  let aiPlayer;
 
   function handleOpponentSelected() {
     setOpponentSelected(!opponentSelected);
   }
 
   function handleAi(bool) {
-    handleOpponentSelected(true);
+    handleOpponentSelected();
     setIsAi(bool);
   }
 
@@ -48,7 +48,7 @@ function Game() {
   })
   
   if (isAi && !aiPlayer) aiPlayer = new AIPlayer('O');
-  if (aiPlayer && currentPlayer === aiPlayer.mark && !Utils.calculateWinner(currentTiles)) {
+  if (aiPlayer && currentPlayer === aiPlayer.mark && !calculateWinner(currentTiles)) {
     const newTiles = aiPlayer.move(currentTiles)
     console.log(newTiles, 'newTILES');
     handlePlay(newTiles);

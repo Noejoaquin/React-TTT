@@ -1,4 +1,4 @@
-function calculateWinner(tiles) {
+export const calculateWinner = (tiles) => {
     const possibleWinningLines = [
       [0, 1, 2],
       [3, 4, 5],
@@ -16,8 +16,4 @@ function calculateWinner(tiles) {
       }
     }
     return null;
-}
-
-export default {
-    calculateWinner,
 }
