@@ -1,17 +1,17 @@
-import Utils from './utils';
+import { calculateWinner } from './utils';
 import Tile from './Tile';
 
 
 function Board({tiles, onPlay, currentPlayer}) {
     function handleTileClick(i) {
-        if (tiles[i] || Utils.calculateWinner(tiles)) return;
+        if (tiles[i] || calculateWinner(tiles)) return;
         // make a copy of state using .slice()
         const newTiles = tiles.slice();
         currentPlayer === 'X' ? newTiles[i] = 'X': newTiles[i] = 'O';
         onPlay(newTiles);
     }
 
-    const winner = Utils.calculateWinner(tiles);
+    const winner = calculateWinner(tiles);
     const status = winner ? `The winner is ${winner}` : `Next player: ${currentPlayer === 'X' ? 'X' : 'O'}`
 
     return (
