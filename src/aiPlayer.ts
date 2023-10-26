@@ -65,7 +65,9 @@ class AIPlayer {
   
     #opponentMadeCornerMove(newTiles: Array<string>) {
       for (let i=0; i<this.corners.length; i+=1) {
-        if (newTiles[this.corners[i]] === this.opponentMark) {
+        // using ! as the non-null asserstion operator here
+        // https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-0.html#non-null-assertion-operator
+        if (newTiles[this.corners[i]!] === this.opponentMark) {
           return true;
         }
       }
@@ -75,7 +77,8 @@ class AIPlayer {
     #getCornerMove(tiles: Array<string>) {
       for (let i=0; i<tiles.length; i+=1) {
         const corner = this.corners[i];
-        if (tiles[corner] === null) return corner;
+        // again we are sure that corner exists here
+        if (tiles[corner!] === null) return corner;
       }
       return undefined;
     }
@@ -86,10 +89,10 @@ class AIPlayer {
       for (const blockingMove in this.winningOrBlockingMap) {
         const combosOfTilesToBlock = this.winningOrBlockingMap[blockingMove];
         // iterate through the set of possible opponent scenarios
-        for (let i=0; i < combosOfTilesToBlock.length; i += 1) {
-          const tilesToBlock = combosOfTilesToBlock[i];
+        for (let i=0; i < combosOfTilesToBlock!.length; i += 1) {
+          const tilesToBlock = combosOfTilesToBlock![i];
           // return the blocking move for the first scenario seen on the board
-          if (tiles[tilesToBlock[0]] === mark && tiles[tilesToBlock[1]] === mark && !tiles[blockingMove]) return parseInt(blockingMove);
+          if (tiles[tilesToBlock![0]] === mark && tiles[tilesToBlock![1]] === mark && !tiles[blockingMove]) return parseInt(blockingMove);
         }
       }
       return undefined;
